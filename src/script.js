@@ -1,5 +1,3 @@
-// src/script.js
-
 document.addEventListener('DOMContentLoaded', (event) => {
   // ナビゲーションリンクにクリックイベントを追加
   document.querySelectorAll('nav a').forEach(link => {
