@@ -6,20 +6,7 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - name: build dependencies
-        run: pnpm build
-
-  release:
+  build-and-release:
     permissions:
       contents: write
       pull-requests: write
@@ -27,19 +14,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: build dependencies
+        run: pnpm build
       - name: Zip the dist directory
         run: zip -r dist.zip dist
-
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v2
         with:
           files: dist.zip
-          # tag: ${{ env.RELEASE_TAG }}
-          # name: Release ${{ env.RELEASE_TAG }}
-          # version: ${{ env.RELEASE_TAG }}
-          # publish: true
+          tag_name: ${{ env.CURRENT_DATETIME }} # Qiitaの記事に合わせて変更
+          name: ${{ env.CURRENT_DATETIME }} # Qiitaの記事に合わせて変更
+          version: ${{ env.RELEASE_TAG }}
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ github.event.pull_request.title }}
-
