@@ -31,21 +31,15 @@ jobs:
       - name: Zip the dist directory
         run: zip -r dist.zip dist
 
-      - name: Create Release Tag And Note
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ github.event.pull_request.title }}
-        uses: release-drafter/release-drafter@v5
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
         with:
+          files: dist.zip
           tag: ${{ env.RELEASE_TAG }}
           name: Release ${{ env.RELEASE_TAG }}
           version: ${{ env.RELEASE_TAG }}
           publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.pull_request.title }}
 
-      - name: Upload Zip to Release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist.zip
-          asset_name: dist.zip
-          asset_content_type: application/zip
