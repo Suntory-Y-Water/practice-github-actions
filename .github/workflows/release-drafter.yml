@@ -1,7 +1,11 @@
 name: Create Release Note
 
 on:
-  push:
+  pull_request:
+    # PRが閉じたタイミングで実行
+    types:
+      - closed
+    # mainブランチのみを対象とする
     branches:
       - main
 
@@ -10,6 +14,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    # リリースブランチからマージのみ実施
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -21,21 +27,22 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 9
+      - name: install dependencies
+        run: pnpm install --frozen-lockfile
       - name: build dependencies
         run: pnpm build
       - name: Zip the dist directory
         run: zip -r dist.zip dist
       
-      - name: Set Release Tag
-        run: echo "CURRENT_DATETIME=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
-      
       - name: Create Release and Upload Assets
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # PRのタイトルと内容をRELEASE_TAGに設定する
+          RELEASE_TAG: ${{ github.event.pull_request.title }}
         uses: softprops/action-gh-release@v2
         with:
           files: dist.zip
-          tag_name: ${{ env.CURRENT_DATETIME }}
-          name: Release ${{ env.CURRENT_DATETIME }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Release ${{ env.RELEASE_TAG }}
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
