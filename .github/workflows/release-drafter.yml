@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -27,10 +28,13 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 9
+
       - name: install dependencies
         run: pnpm install --frozen-lockfile
+
       - name: build dependencies
         run: pnpm build
+        
       - name: Zip the dist directory
         run: zip -r dist.zip dist
       
