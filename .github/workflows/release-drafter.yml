@@ -2,10 +2,8 @@ name: Create Release Note
 
 on:
   pull_request:
-    # PRが閉じたタイミングで実行
     types:
       - closed
-    # mainブランチのみを対象とする
     branches:
       - main
 
@@ -14,7 +12,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    # リリースブランチからマージのみ実施
     if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release')
     runs-on: ubuntu-latest
     steps:
@@ -43,18 +40,17 @@ jobs:
 
       - run: echo "RELEASE_FILENAME=release_${{ env.CURRENT_DATETIME }}.zip" >> $GITHUB_ENV
 
-      # ZIPファイルを作成する
+      # ZIPファイルを作成する（distディレクトリを対象）
       - name: Archive Release
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
           filename: ${{ env.RELEASE_FILENAME }}
-          directory: dist
-          path: .
+          directory: dist  # distディレクトリにZIPファイルを作成
 
-      # 再度ファイルの一覧を表示してZIPファイルの存在を確認
-      - name: List files
-        run: ls -la ./
+      # distディレクトリ内のファイルをリストして確認
+      - name: List files in dist
+        run: ls -la dist
 
       # リリースを作成し、生成されたZIPファイルをアップロードする
       - name: Create Release and Upload Assets
@@ -63,8 +59,7 @@ jobs:
           RELEASE_TAG: ${{ github.event.pull_request.title }}
         uses: softprops/action-gh-release@v2
         with:
-          # 明示的にファイルパスを指定
-          files: ./${{ env.RELEASE_FILENAME }}
+          files: dist/${{ env.RELEASE_FILENAME }}  # dist内のZIPファイルを指定
           tag_name: ${{ env.RELEASE_TAG }}
           name: Release ${{ env.RELEASE_TAG }}
           draft: false
