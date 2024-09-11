@@ -55,3 +55,5 @@ type ReadOnlyPerson = Readonly<Person>;
 
 const person: ReadOnlyPerson = new Person('Alice', 28);
 // person.name = 'Bob'; // Error: Cannot assign to 'name' because it is a read-only property.
+
+console.log(person.name); // Alice
