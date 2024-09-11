@@ -32,18 +32,14 @@ jobs:
       - name: build dependencies
         run: pnpm build
         
-      # ZIPファイルを作成する(distディレクトリを対象)
+      # ZIPファイルを作成する（distディレクトリを対象）
       - name: Archive Release
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          filename: extensions
-          # distディレクトリにZIPファイルを作成
+          filename: extensions.zip
+          # distディレクトリにZIPファイルを作成 
           directory: dist
-
-      # distディレクトリ内のファイルをリストして確認
-      - name: List files in dist
-        run: ls -la dist
 
       # リリースを作成し、生成されたZIPファイルをアップロードする
       - name: Create Release and Upload Assets
@@ -52,7 +48,8 @@ jobs:
           RELEASE_TAG: ${{ github.event.pull_request.title }}
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/extensions  # dist内のZIPファイルを指定
+          # dist内のZIPファイルを指定
+          files: dist/extensions.zip
           tag_name: ${{ env.RELEASE_TAG }}
           name: Release ${{ env.RELEASE_TAG }}
           draft: false
