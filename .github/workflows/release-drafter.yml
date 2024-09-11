@@ -32,21 +32,14 @@ jobs:
       - name: build dependencies
         run: pnpm build
         
-      # 日時を取得し、ファイル名を決定する
-      - name: Set Time
-        env:
-          TZ: 'Asia/Tokyo'
-        run: echo "CURRENT_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
-
-      - run: echo "RELEASE_FILENAME=release_${{ env.CURRENT_DATETIME }}.zip" >> $GITHUB_ENV
-
-      # ZIPファイルを作成する（distディレクトリを対象）
+      # ZIPファイルを作成する(distディレクトリを対象)
       - name: Archive Release
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          filename: ${{ env.RELEASE_FILENAME }}
-          directory: dist  # distディレクトリにZIPファイルを作成
+          filename: extensions
+          # distディレクトリにZIPファイルを作成
+          directory: dist
 
       # distディレクトリ内のファイルをリストして確認
       - name: List files in dist
@@ -59,7 +52,7 @@ jobs:
           RELEASE_TAG: ${{ github.event.pull_request.title }}
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/${{ env.RELEASE_FILENAME }}  # dist内のZIPファイルを指定
+          files: dist/extensions  # dist内のZIPファイルを指定
           tag_name: ${{ env.RELEASE_TAG }}
           name: Release ${{ env.RELEASE_TAG }}
           draft: false
